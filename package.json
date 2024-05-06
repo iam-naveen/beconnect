@@ -1,0 +1,36 @@
+{
+  "name": "video-call",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.1",
+    "@uploadthing/react": "latest",
+    "agora-rtc-react": "^2.0.0",
+    "drizzle-orm": "^0.30.10",
+    "next": "latest",
+    "next-auth": "beta",
+    "pg": "^8.11.5",
+    "react": "latest",
+    "react-dom": "latest",
+    "uploadthing": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "autoprefixer": "latest",
+    "drizzle-kit": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "postcss": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest"
+  }
+}
