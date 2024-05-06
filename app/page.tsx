@@ -1,4 +1,4 @@
-import { SignIn } from './sign-in';
+import SignIn from './sign-in';
 import { auth } from '@/server/auth';
 import { db } from '@/server/db';
 import { rooms } from '@/server/db/schema';
