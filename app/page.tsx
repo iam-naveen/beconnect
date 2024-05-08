@@ -1,7 +1,7 @@
 import SignIn from './sign-in';
 import { auth } from '@/server/auth';
 import { db } from '@/server/db';
-import { rooms } from '@/server/db/schema';
+import { rooms, userToRoom } from '@/server/db/schema';
 import { randomBytes } from 'crypto';
 import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
@@ -59,8 +59,13 @@ export default async function Home(props: { searchParams: { error: string } }) {
               createdAt: new Date()
             })
             .returning({id: rooms.id})
-            .then(room => {
-              return redirect(`/channel/${room[0].id}`)
+            .then(async room => {
+              await db.insert(userToRoom).values({
+                userId: session.user.id,
+                roomId: room[0].id
+              }).then(() => {
+                return redirect(`/channel/${room[0].id}`)
+              })
             })
           }}
             className="flex items-center gap-2"

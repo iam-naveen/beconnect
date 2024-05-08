@@ -3,6 +3,7 @@
 import AgoraRTC, { AgoraRTCProvider, useRTCClient, } from "agora-rtc-react";
 import ChatArea from "./chat-area";
 import Videos from "./videos";
+import { rooms } from "@/server/db/schema";
 
 export interface File {
   id: string
@@ -14,11 +15,12 @@ export interface File {
   uploadedById: string
 }
 
+type channel = typeof rooms.$inferSelect
+
 function Call(props: {
   appId: string;
-  channelName: string,
-  channelId: string
-  token: string
+  channel: channel,
+  userId: string
   files: File[];
 }) {
   const client = useRTCClient(
@@ -27,9 +29,9 @@ function Call(props: {
 
   return (
     <AgoraRTCProvider client={client}>
-      <div className="grid grid-cols-4 w-full h-screen p-1">
-        <Videos channelName={props.channelName} AppID={props.appId} token={props.token} />
-        <ChatArea files={props.files} roomId={props.channelId} />
+      <div className="grid grid-cols-4 w-full h-screen">
+        <Videos channelName={props.channel.name ?? ""} AppID={props.appId} userId={props.userId} />
+        <ChatArea files={props.files} roomId={props.channel.id} />
       </div>
     </AgoraRTCProvider>
   );

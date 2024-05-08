@@ -1,15 +1,14 @@
 import Call from "./components/call";
 import { auth } from "@/server/auth";
 import { db } from "@/server/db";
-import { files, rooms } from "@/server/db/schema";
-import { eq } from "drizzle-orm";
+import { files, rooms, userToRoom } from "@/server/db/schema";
+import { and, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 export default async function Page(
-    { params, searchParams }:
+    { params }:
     {
       params: { channelId: string },
-      searchParams: { token: string }
     }
 ) {
 
@@ -18,14 +17,24 @@ export default async function Page(
         return redirect('/')
     }
 
-    const [channel, fileList] = await db.batch([
+    const [channel, fileList, isMember] = await db.batch([
         db.query.rooms.findFirst({
             where: eq(rooms.id, params.channelId)
         }),
         db.query.files.findMany({
             where: eq(files.roomId, params.channelId),
-        })
+        }),
+        db.query.userToRoom.findFirst({
+            where: and(
+                eq(userToRoom.userId, session.user.id),
+                eq(userToRoom.roomId, params.channelId)
+            )
+        }),
     ])
+
+    if (!isMember) {
+        return redirect('/?error=You_are_not_a_member_of_this_channel.')
+    }
 
     if (!channel || !channel.name) {
         return redirect('/?error=Channel_not_found.')
@@ -33,10 +42,10 @@ export default async function Page(
 
     return (
         <main className="flex w-full flex-col">
-            <p className="absolute z-10 mt-2 ml-12 text-2xl font-bold text-gray-900">
+            <p className="absolute z-10 p-2 text-2xl font-bold text-gray-900">
                 {channel.name}
             </p>
-            <Call files={fileList} appId={process.env.PUBLIC_AGORA_APP_ID!} token={searchParams.token} channelId={channel.id} channelName={channel.name}></Call>
+            <Call files={fileList} appId={process.env.PUBLIC_AGORA_APP_ID!} userId={session.user.id} channel={channel}></Call>
         </main>
     )
 }
