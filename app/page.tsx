@@ -7,11 +7,8 @@ import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 
 export default async function Home(props: { searchParams: { error: string, message: string } }) {
-
   const session = await auth()
-
   const { error, message } = props.searchParams
-
   return (
     <div className="flex flex-col items-center">
       <h1 className="mb-5 mt-20 text-4xl font-extrabold leading-none tracking-tight">
