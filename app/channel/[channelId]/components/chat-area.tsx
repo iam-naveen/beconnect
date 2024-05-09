@@ -48,7 +48,7 @@ export default function ChatArea({ files, roomId }: { files: File[], roomId: str
             <Link className="w-fit shrink-0" href={`/file/${file.key}`} target="_blank" rel="noreferrer">
               <Image width={5} height={5} src={file.url} alt={file.id} className="w-20 h-20 aspect-square rounded" />
             </Link>
-            <div className="flex flex-col h-full pl-2 justify-center gap-1 text-black">
+            <div className="flex flex-col h-full pl-2 justify-center gap-1 text-black truncate">
               <div className="text-sm font-semibold truncate">{file.name}</div>
               <div className="text-xs">{file.size} bytes</div>
               <div className="text-xs">{file.type}</div>
