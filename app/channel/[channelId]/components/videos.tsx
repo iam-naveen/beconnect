@@ -10,7 +10,7 @@ import {
   useRemoteAudioTracks,
   useRemoteUsers,
 } from "agora-rtc-react";
-import { Mic, MicOff, Video, VideoOff } from "lucide-react";
+import { Copy, Mic, MicOff, Video, VideoOff } from "lucide-react";
 import { useState } from "react";
 
 export default function Videos(props: { channelName: string; AppID: string, userId: string }) {
@@ -26,7 +26,7 @@ export default function Videos(props: { channelName: string; AppID: string, user
   usePublish([localMicrophoneTrack, localCameraTrack]);
   useJoin(
     async () => {
-      return await fetch( `/api/validate-user`, {
+      return await fetch(`/api/validate-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,8 +37,8 @@ export default function Videos(props: { channelName: string; AppID: string, user
           appid: AppID,
         }),
       })
-      .then((res) => res.json())
-      .catch((err) => console.error(err));
+        .then((res) => res.json())
+        .catch((err) => console.error(err));
     }
   )
 
@@ -74,23 +74,33 @@ export default function Videos(props: { channelName: string; AppID: string, user
       {remoteUsers.map((user) => (
         <RemoteUser user={user} />
       ))}
-      <div className="absolute z-10 bottom-0 left-0 right-0 flex justify-center items-center pb-4 gap-3">
-        <div className="cursor-pointer rounded-full border-2 p-3 border-white text-white">
-        {video ? 
-          <Video onClick={() => setVideo(false)} /> : 
-          <VideoOff onClick={() => setVideo(true)} />}
+      <div className="absolute z-10 bottom-0 left-0 right-0 flex flex-col pb-4 items-center gap-3">
+        <p className="bg-white flex gap-3 py-2 px-4 rounded-full w-fit">
+          <span>Your Token:</span>
+          <b>{props.userId}</b>
+          <Copy 
+            className="cursor-pointer"
+            onClick={() => navigator.clipboard.writeText(props.userId)}
+          />
+        </p>
+        <div className="flex items-center justify-center gap-3">
+          <div className="cursor-pointer rounded-full border-2 p-3 border-white text-white">
+            {video ?
+              <Video onClick={() => setVideo(false)} /> :
+              <VideoOff onClick={() => setVideo(true)} />}
+          </div>
+          <div className="cursor-pointer rounded-full border-2 p-3 border-white text-white">
+            {audio ?
+              <Mic onClick={() => setAudio(false)} /> :
+              <MicOff onClick={() => setAudio(true)} />}
+          </div>
+          <a
+            className="px-5 py-3 text-base font-medium text-center text-white bg-red-400 rounded-lg hover:bg-red-500 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900 w-40"
+            href="/"
+          >
+            End Call
+          </a>
         </div>
-        <div className="cursor-pointer rounded-full border-2 p-3 border-white text-white">
-        {audio ? 
-          <Mic onClick={() => setAudio(false)} /> :
-          <MicOff onClick={() => setAudio(true)} />}
-        </div>
-        <a
-          className="px-5 py-3 text-base font-medium text-center text-white bg-red-400 rounded-lg hover:bg-red-500 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900 w-40"
-          href="/"
-        >
-          End Call
-        </a>
       </div>
     </div>
   );

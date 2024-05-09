@@ -41,8 +41,8 @@ export default async function Page(
     }
 
     return (
-        <main className="flex w-full flex-col">
-            <p className="absolute z-10 p-2 text-2xl font-bold text-gray-900">
+        <main className="flex w-full flex-col relative">
+            <p className="absolute top-2 left-2 z-10 py-2 px-4 text-2xl font-semibold bg-white rounded-full text-gray-900">
                 {channel.name}
             </p>
             <Call files={fileList} appId={process.env.PUBLIC_AGORA_APP_ID!} userId={session.user.id} channel={channel}></Call>

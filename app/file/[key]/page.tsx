@@ -1,33 +1,75 @@
-import { auth } from "@/server/auth";
-import { db } from "@/server/db";
-import { files, userToRoom } from "@/server/db/schema";
-import { and, eq } from "drizzle-orm";
+"use client"
 
-async function ViewPage({ params }: { params: { key: string } }) {
+import { Download } from "lucide-react";
+import { useState } from "react";
+
+export function ViewPage({ params }: { params: { key: string } }) {
   const { key } = params;
 
-  const session = await auth()
+  const [verified, setVerified] = useState(false)
+  const [file, setFile] = useState<File | null>(null)
 
-  if (!session) {
-    return <div>Unauthorized</div>
-  }
-  if (!key) {
-    return <div>File not found</div>
-  }
-  const file = await db.query.files.findFirst({
-    where: eq(files.key, key)
-  })
-  if (!file || !file.roomId) {
-    return <div>File not found</div>
-  }
-  await db.query.userToRoom.findFirst({
-    where: and(
-      eq(userToRoom.userId, session.user.id),
-      eq(userToRoom.roomId, file.roomId)
-    )
-  })
-  return <div className="size-full object-contain">
-    <img src={file.url} alt={file.name} className="size-full" />
+  return <div className="flex flex-col gap-2 items-center pt-52">
+    {verified && file ?
+      <div
+        className="flex items-center gap-2 cursor-pointer border p-5 rounded-full text-sm font-semibold shadow-md"
+        onClick={e => {
+          e.preventDefault()
+          // @ts-expect-error - we know this is a file
+          fetch(file.url).then(res => res.blob()).then(blob => {
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = file.name
+            a.click()
+          })
+        }}
+      >
+        <Download size={32} className="text-blue-500" />
+        {file.name}
+      </div>
+      : <>
+        <h1 className="text-blue-500 text-3xl font-bold">Beconnect</h1>
+        <p className="text-gray-500 text-sm">Please Enter the key to view the file</p>
+        <form
+          className="flex flex-col gap-2"
+          onSubmit={async (e) => {
+            e.preventDefault()
+            const formData = new FormData(e.currentTarget)
+            const token = formData.get('key')
+            if (!token) return
+            await fetch('/api/token/verify', {
+              method: 'POST',
+              body: JSON.stringify({ token, key }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            }).then(async res => {
+              if (res.ok) {
+                const data = await res.json()
+                setVerified(data.verified)
+                setFile(data.file)
+              } else {
+                const text = await res.text()
+                alert(text)
+              }
+            }).catch(err => {
+              console.error(err)
+              alert(err.message)
+            })
+          }}>
+          <input
+            className="bg-gray-200 border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-black leading-tight"
+            id="key"
+            type="text"
+            name="key"
+            placeholder="Enter key"
+            required
+          />
+          <button type="submit" className="text-center w-full px-3 py-2 text-white bg-blue-400 rounded-lg hover:bg-blue-500">Submit</button>
+        </form>
+      </>
+    }
   </div>
 }
 
