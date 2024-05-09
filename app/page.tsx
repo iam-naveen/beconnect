@@ -1,4 +1,4 @@
-import SignIn from './sign-in';
+import SignIn from "./sign-in";
 import { auth } from '@/server/auth';
 import { db } from '@/server/db';
 import { rooms, userToRoom } from '@/server/db/schema';
@@ -6,18 +6,18 @@ import { randomBytes } from 'crypto';
 import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 
-export default async function Home(props: { searchParams: { error: string } }) {
+export default async function Home(props: { searchParams: { error: string, message: string } }) {
 
   const session = await auth()
 
-  const { error } = props.searchParams
+  const { error, message } = props.searchParams
 
   return (
     <div className="flex flex-col items-center">
       <h1 className="mb-5 mt-20 text-4xl font-extrabold leading-none tracking-tight">
-        <span className="text-blue-500">Facetime</span>
+        <span className="text-blue-500">Beconnect</span>
       </h1>
-      {!session && <SignIn />}
+      {!session && <SignIn message={message} />}
       {session && (
         <>
           <h2 className="text-xl font-bold">Join a Channel</h2>
